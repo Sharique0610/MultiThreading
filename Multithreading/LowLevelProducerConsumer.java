@@ -1,0 +1,49 @@
+package Multithreading;
+
+import java.util.LinkedList;
+import java.util.Random;
+
+public class LowLevelProducerConsumer {
+
+	LinkedList<Integer> list = new LinkedList<>();
+	private int limit = 10;
+	private Object lock = new Object();
+
+	public void producer() throws InterruptedException {
+
+		int value = 0;
+		while (true) {
+
+			synchronized (lock) {
+
+				while (list.size() == limit) {
+					lock.wait();
+				}
+				list.add(value++);
+				lock.notify();
+			}
+		}
+
+	}
+
+	public void consumer() throws InterruptedException {
+
+		Random random = new Random();
+		while (true) {
+
+			synchronized (lock) {
+
+				while (list.size() == 0) {
+					lock.wait();
+				}
+				System.out.print("Size of List is : " + list.size());
+				int value = list.removeFirst();
+				System.out.println("  - Removed Element : " + value);
+				lock.notify();
+			
+			}
+			Thread.sleep(random.nextInt(5000));
+		}
+	}
+
+}
